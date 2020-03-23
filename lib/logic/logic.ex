@@ -2,10 +2,13 @@ defmodule AyahDay.Logic do
   alias HTTPoison.Response
 
   @ayah_api_url "https://salamquran.com/fa/api/v6/aya/day"
+  @pic_source "http://www.everyayah.com/data/images_png/"
+  @priv_dir :code.priv_dir(:ayah_day)
 
   def main do
     get_ayah_for_this_day()
     |> get_verse_key()
+    |> get_and_cache_ayah_pic()
   end
 
   def get_ayah_for_this_day do
@@ -25,4 +28,37 @@ defmodule AyahDay.Logic do
   end
 
   def get_verse_key(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
+
+  def get_and_cache_ayah_pic(verse_key) do
+    get_ayah_pic(verse_key)
+    |> cache_pic(verse_key)
+  end
+
+  def get_ayah_pic(verse_key) do
+    verse_key
+    |> pic_link_creator()
+    |> HTTPoison.get()
+    |> export_pic()
+  end
+
+  def pic_link_creator(verse_key) do
+    @pic_source <> verse_key <> ".png"
+  end
+
+  def export_pic({:ok, %Response{status_code: 200, body: body}}) do
+    body
+  end
+
+  def export_pic(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
+
+  def cache_pic(image_bin, verse_key) do
+    verse_key
+    |> image_path()
+    |> File.write!(image_bin)
+  end
+
+  def image_path(verse_key) do
+    @priv_dir
+    |> Path.join("/static/" <> verse_key <> ".png")
+  end
 end
