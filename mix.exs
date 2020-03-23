@@ -16,7 +16,7 @@ defmodule AyahDay.MixProject do
   def application do
     [
       mod: {AyahDay, []},
-      extra_applications: []
+      extra_applications: [:httpoison]
     ]
   end
 
@@ -25,6 +25,8 @@ defmodule AyahDay.MixProject do
     [
       {:scenic, "~> 0.10"},
       {:scenic_driver_glfw, "~> 0.10", targets: :host},
+      {:httpoison, "~> 1.6"},
+      {:jason, "~> 1.2"}
     ]
   end
 end
