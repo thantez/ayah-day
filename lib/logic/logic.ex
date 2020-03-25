@@ -3,17 +3,18 @@ defmodule AyahDay.Logic do
 
   @ayah_api_url "https://salamquran.com/fa/api/v6/aya/day"
   @pic_source "http://www.everyayah.com/data/images_png/"
-  @sound_source "http://www.everyayah.com/data/"
-  @translate_path ""
-  @tafsir_path ""
+  @sound_source "http://www.everyayah.com/data/Abu_Bakr_Ash-Shaatree_128kbps/"
+  @translate_source "https://dl.salamquran.com/ayat/makarem.fa.kabiri-translation-16/"
+  @tafsir_source "https://dl.salamquran.com/ayat/qaraati.fa.qaraati-tafsir-16/"
   @priv_dir :code.priv_dir(:ayah_day)
 
   def main do
     get_ayah_for_this_day()
     |> get_verse_key()
     |> get_and_cache_ayah_content(&img_link_creator/1, &img_path_creator/1)
-
-    # |> get_and_cache_ayah_sound()
+    |> get_and_cache_ayah_content(&sound_link_creator/1, &sound_path_creator/1)
+    |> get_and_cache_ayah_content(&translate_link_creator/1, &translate_path_creator/1)
+    |> get_and_cache_ayah_content(&tafsir_link_creator/1, &tafsir_path_creator/1)
   end
 
   def get_ayah_for_this_day do
@@ -66,6 +67,43 @@ defmodule AyahDay.Logic do
 
   def img_path_creator(verse_key) do
     @priv_dir
-    |> Path.join("/static/" <> verse_key <> ".png")
+    |> Path.join("/static/image/" <> verse_key <> ".png")
+  end
+
+  def sound_link_creator(verse_key) do
+    verse_key_with_zero = zero_to_verse(verse_key)
+    @sound_source <> verse_key_with_zero <> ".mp3"
+  end
+
+  def sound_path_creator(verse_key) do
+    @priv_dir
+    |> Path.join("/static/sound/" <> verse_key <> ".mp3")
+  end
+
+  def translate_link_creator(verse_key) do
+    verse_key_with_zero = zero_to_verse(verse_key)
+    @translate_source <> verse_key_with_zero <> ".mp3"
+  end
+
+  def translate_path_creator(verse_key) do
+    @priv_dir
+    |> Path.join("/static/translate/" <> verse_key <> ".mp3")
+  end
+
+  def tafsir_link_creator(verse_key) do
+    verse_key_with_zero = zero_to_verse(verse_key)
+    @tafsir_source <> verse_key_with_zero <> ".mp3"
+  end
+
+  def tafsir_path_creator(verse_key) do
+    @priv_dir
+    |> Path.join("/static/tafsir/" <> verse_key <> ".mp3")
+  end
+
+  def zero_to_verse(verse_key, join_char \\ "") do
+    verse_key
+    |> String.split("_")
+    |> Enum.map(fn key -> String.pad_leading(key, 3, "0") end)
+    |> Enum.join(join_char)
   end
 end
