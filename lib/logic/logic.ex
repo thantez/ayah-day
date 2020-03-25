@@ -3,12 +3,15 @@ defmodule AyahDay.Logic do
 
   @ayah_api_url "https://salamquran.com/fa/api/v6/aya/day"
   @pic_source "http://www.everyayah.com/data/images_png/"
+  @sound_source "http://www.everyayah.com/data/"
+  @translate_path ""
+  @tafsir_path ""
   @priv_dir :code.priv_dir(:ayah_day)
 
   def main do
     get_ayah_for_this_day()
     |> get_verse_key()
-    |> get_and_cache_ayah_pic()
+    |> get_and_cache_ayah_content(&img_link_creator/1, &img_path_creator/1)
 
     # |> get_and_cache_ayah_sound()
   end
@@ -31,9 +34,11 @@ defmodule AyahDay.Logic do
 
   def get_verse_key(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
 
-  def get_and_cache_ayah_pic(verse_key) do
-    get_ayah_content(verse_key, &pic_link_creator/1)
-    |> cache_content(verse_key, &image_path/1)
+  def get_and_cache_ayah_content(verse_key, link_creator, path_creator) do
+    get_ayah_content(verse_key, link_creator)
+    |> cache_content(verse_key, path_creator)
+
+    verse_key
   end
 
   def get_ayah_content(verse_key, link_creator) do
@@ -43,8 +48,10 @@ defmodule AyahDay.Logic do
     |> export_body()
   end
 
-  def pic_link_creator(verse_key) do
-    @pic_source <> verse_key <> ".png"
+  def cache_content(image_bin, verse_key, path_creator) do
+    verse_key
+    |> path_creator.()
+    |> File.write!(image_bin)
   end
 
   def export_body({:ok, %Response{status_code: 200, body: body}}) do
@@ -53,13 +60,11 @@ defmodule AyahDay.Logic do
 
   def export_body(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
 
-  def cache_content(image_bin, verse_key, path_creator) do
-    verse_key
-    |> path_creator.()
-    |> File.write!(image_bin)
+  def img_link_creator(verse_key) do
+    @pic_source <> verse_key <> ".png"
   end
 
-  def image_path(verse_key) do
+  def img_path_creator(verse_key) do
     @priv_dir
     |> Path.join("/static/" <> verse_key <> ".png")
   end
