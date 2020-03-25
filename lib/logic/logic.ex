@@ -9,6 +9,8 @@ defmodule AyahDay.Logic do
     get_ayah_for_this_day()
     |> get_verse_key()
     |> get_and_cache_ayah_pic()
+
+    # |> get_and_cache_ayah_sound()
   end
 
   def get_ayah_for_this_day do
@@ -30,30 +32,30 @@ defmodule AyahDay.Logic do
   def get_verse_key(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
 
   def get_and_cache_ayah_pic(verse_key) do
-    get_ayah_pic(verse_key)
-    |> cache_pic(verse_key)
+    get_ayah_content(verse_key, &pic_link_creator/1)
+    |> cache_content(verse_key, &image_path/1)
   end
 
-  def get_ayah_pic(verse_key) do
+  def get_ayah_content(verse_key, link_creator) do
     verse_key
-    |> pic_link_creator()
+    |> link_creator.()
     |> HTTPoison.get()
-    |> export_pic()
+    |> export_body()
   end
 
   def pic_link_creator(verse_key) do
     @pic_source <> verse_key <> ".png"
   end
 
-  def export_pic({:ok, %Response{status_code: 200, body: body}}) do
+  def export_body({:ok, %Response{status_code: 200, body: body}}) do
     body
   end
 
-  def export_pic(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
+  def export_body(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
 
-  def cache_pic(image_bin, verse_key) do
+  def cache_content(image_bin, verse_key, path_creator) do
     verse_key
-    |> image_path()
+    |> path_creator.()
     |> File.write!(image_bin)
   end
 
