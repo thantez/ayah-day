@@ -100,10 +100,10 @@ defmodule AyahDay.Logic do
     |> Path.join("/static/tafsir/" <> verse_key <> ".mp3")
   end
 
-  def zero_to_verse(verse_key, join_char \\ "") do
+  def zero_to_verse(verse_key) do
     verse_key
     |> String.split("_")
     |> Enum.map(fn key -> String.pad_leading(key, 3, "0") end)
-    |> Enum.join(join_char)
+    |> Enum.join("")
   end
 end
