@@ -1,11 +1,11 @@
 defmodule AyahDay.Logic do
   alias HTTPoison.Response
+  alias AyahDay.Logic.ExportTafsirFileNames
 
   @ayah_api_url "https://salamquran.com/fa/api/v6/aya/day"
   @pic_source "http://www.everyayah.com/data/images_png/"
   @sound_source "http://www.everyayah.com/data/Abu_Bakr_Ash-Shaatree_128kbps/"
   @translate_source "https://dl.salamquran.com/ayat/makarem.fa.kabiri-translation-16/"
-  @tafsir_source "https://dl.salamquran.com/ayat/qaraati.fa.qaraati-tafsir-16/"
   @priv_dir :code.priv_dir(:ayah_day)
 
   def main do
@@ -91,8 +91,10 @@ defmodule AyahDay.Logic do
   end
 
   def tafsir_link_creator(verse_key) do
-    verse_key_with_zero = zero_to_verse(verse_key)
-    @tafsir_source <> verse_key_with_zero <> ".mp3"
+    tafsir_export = ExportTafsirFileNames.main()
+    key = (zero_to_verse(verse_key) <> ".mp3") |> String.to_atom()
+
+    tafsir_export[key]
   end
 
   def tafsir_path_creator(verse_key) do
