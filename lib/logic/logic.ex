@@ -14,18 +14,23 @@ defmodule AyahDay.Logic do
     receive do
       {:start, home_pid} ->
         IO.puts("I'm in logic")
-        verse_key = logic()
-        send(home_pid, {:done, verse_key})
+        information = logic()
+        send(home_pid, {:done, information})
     end
   end
 
   def logic() do
-    get_ayah_for_this_day()
-    |> get_verse_key()
+    {verse_key, translate} =
+      get_ayah_for_this_day()
+      |> get_verse_key()
+
+    verse_key
     |> get_and_cache_ayah_content(&img_link_creator/1, &img_path_creator/1, &img_writer/2)
     |> get_and_cache_ayah_content(&sound_link_creator/1, &sound_path_creator/1)
     |> get_and_cache_ayah_content(&translate_link_creator/1, &translate_path_creator/1)
     |> get_and_cache_ayah_content(&tafsir_link_creator/1, &tafsir_path_creator/1)
+
+    {verse_key, translate}
   end
 
   def get_ayah_for_this_day do
@@ -40,8 +45,11 @@ defmodule AyahDay.Logic do
 
   def export_json(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
 
-  def get_verse_key(%{"ok" => true, "result" => %{"aya" => ayah, "sura" => surah}}) do
-    "#{surah}_#{ayah}"
+  def get_verse_key(%{
+        "ok" => true,
+        "result" => %{"aya" => ayah, "sura" => surah, "translate" => %{"text" => translate}}
+      }) do
+    {"#{surah}_#{ayah}", translate}
   end
 
   def get_verse_key(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
@@ -97,7 +105,7 @@ defmodule AyahDay.Logic do
 
     open(path)
     |> format("png")
-    |> extent("800x800")
+    |> extent("800x605")
     |> gravity("center")
     |> save(in_place: true)
   end
