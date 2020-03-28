@@ -1,4 +1,6 @@
 defmodule AyahDay.Logic do
+  import Mogrify
+
   alias HTTPoison.Response
   alias AyahDay.Logic.ExportTafsirFileNames
 
@@ -9,9 +11,18 @@ defmodule AyahDay.Logic do
   @priv_dir :code.priv_dir(:ayah_day)
 
   def main do
+    receive do
+      {:start, home_pid} ->
+        IO.puts("I'm in logic")
+        verse_key = logic()
+        send(home_pid, {:done, verse_key})
+    end
+  end
+
+  def logic() do
     get_ayah_for_this_day()
     |> get_verse_key()
-    |> get_and_cache_ayah_content(&img_link_creator/1, &img_path_creator/1)
+    |> get_and_cache_ayah_content(&img_link_creator/1, &img_path_creator/1, &img_writer/2)
     |> get_and_cache_ayah_content(&sound_link_creator/1, &sound_path_creator/1)
     |> get_and_cache_ayah_content(&translate_link_creator/1, &translate_path_creator/1)
     |> get_and_cache_ayah_content(&tafsir_link_creator/1, &tafsir_path_creator/1)
@@ -35,9 +46,14 @@ defmodule AyahDay.Logic do
 
   def get_verse_key(param), do: IO.puts("Json is not true #{IO.inspect(param)}")
 
-  def get_and_cache_ayah_content(verse_key, link_creator, path_creator) do
+  def get_and_cache_ayah_content(
+        verse_key,
+        link_creator,
+        path_creator,
+        file_writer \\ &File.write!/2
+      ) do
     get_ayah_content(verse_key, link_creator)
-    |> cache_content(verse_key, path_creator)
+    |> cache_content(verse_key, path_creator, file_writer)
 
     verse_key
   end
@@ -49,10 +65,10 @@ defmodule AyahDay.Logic do
     |> export_body()
   end
 
-  def cache_content(image_bin, verse_key, path_creator) do
+  def cache_content(image_bin, verse_key, path_creator, file_writer) do
     verse_key
     |> path_creator.()
-    |> File.write!(image_bin)
+    |> file_writer.(image_bin)
   end
 
   def export_body({:ok, %Response{status_code: 200, body: body}}) do
@@ -68,6 +84,16 @@ defmodule AyahDay.Logic do
   def img_path_creator(verse_key) do
     @priv_dir
     |> Path.join("/static/image/" <> verse_key <> ".png")
+  end
+
+  def img_writer(path, bin) do
+    File.write!(path, bin)
+
+    open(path)
+    |> format("png")
+    |> extent("800x800")
+    |> gravity("center")
+    |> save(in_place: true)
   end
 
   def sound_link_creator(verse_key) do

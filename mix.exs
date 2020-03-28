@@ -26,7 +26,8 @@ defmodule AyahDay.MixProject do
       {:scenic, "~> 0.10"},
       {:scenic_driver_glfw, "~> 0.10", targets: :host},
       {:httpoison, "~> 1.6"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:mogrify, "~> 0.7.3"}
     ]
   end
 end
