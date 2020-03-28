@@ -52,8 +52,14 @@ defmodule AyahDay.Logic do
         path_creator,
         file_writer \\ &File.write!/2
       ) do
-    get_ayah_content(verse_key, link_creator)
-    |> cache_content(verse_key, path_creator, file_writer)
+    path =
+      verse_key
+      |> path_creator.()
+
+    unless File.exists?(path) do
+      get_ayah_content(verse_key, link_creator)
+      |> cache_content(verse_key, path_creator, file_writer)
+    end
 
     verse_key
   end
