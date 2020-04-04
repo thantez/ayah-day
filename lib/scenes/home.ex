@@ -54,7 +54,7 @@ defmodule AyahDay.Scene.Home do
           Graph.build()
           |> group(fn g ->
             g
-            |> text("متن نمونه",
+            |> text(translate,
               t: {0, 700},
               fill: :white,
               font: @custom_metrics_hash
