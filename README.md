@@ -19,12 +19,13 @@ then:
 ```bash
 cd ayah-day
 mix deps.get
+mix compile
 mix scenic.run
 ```
 
 # Roadmap
 
-* [ ] Fix showing Persian translation text's bug
+* [ ] bug fix and exception handling
 * [ ] app will start when linux boots up
 * [ ] install script
 * [ ] Adding a setting/options page for customization
