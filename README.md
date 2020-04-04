@@ -7,3 +7,23 @@ So, I had an idea to writing a program that would show me a verse from this book
 # Description
 
 This is a simple implementation. :))
+
+# installation
+
+install [Elixir](www.elixir-lang.com)
+clone this repo.
+
+then:
+
+```bash
+cd ayah-day
+mix deps.get
+mix scenic.run
+```
+
+# Roadmap
+
+* [ ] Fix showing Persian translation text's bug
+* [ ] app will start when linux boots up
+* [ ] Adding a setting/options page for customization
+
