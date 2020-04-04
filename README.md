@@ -10,7 +10,7 @@ This is a simple implementation. :))
 
 # installation
 
-install [Elixir](www.elixir-lang.com)
+[install Elixir](https://elixir-lang.org/install.html)
 clone this repo.
 
 then:
@@ -25,5 +25,6 @@ mix scenic.run
 
 * [ ] Fix showing Persian translation text's bug
 * [ ] app will start when linux boots up
+* [ ] install script
 * [ ] Adding a setting/options page for customization
 
