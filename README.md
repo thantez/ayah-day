@@ -23,9 +23,11 @@ mix compile
 mix scenic.run
 ```
 
-# Roadmap
+# TODO
 
 * [ ] bug fix and exception handling
+* [ ] documentation
+* [ ] unit tests
 * [ ] app will start when linux boots up
 * [ ] install script
 * [ ] Adding a setting/options page for customization
